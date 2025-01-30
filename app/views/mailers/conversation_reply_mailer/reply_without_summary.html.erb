@@ -5,7 +5,7 @@
     <% end %>
     <% if message.attachments %>
       <% message.attachments.each do |attachment| %>
-        📎 <a href="<%= attachment.file_url %>" target="_blank" title="Clic para ver el archivo adjunto"><%= attachment.filename %></a><br>
+        📎 <a href="<%= attachment.file_url %>" target="_blank" title="Clic para ver el archivo adjunto"><%= File.basename(CGI.unescape(attachment.file_url)) %></a><br>
       <% end %>
     <% end %>
   </p>
