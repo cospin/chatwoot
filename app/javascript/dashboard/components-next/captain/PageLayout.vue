@@ -68,14 +68,22 @@ const handlePageChange = event => {
 <template>
   <section class="flex flex-col w-full h-full overflow-hidden bg-n-background">
     <header class="sticky top-0 z-10 px-6 xl:px-0">
-      <div class="w-full max-w-[960px] mx-auto">
+      <div class="w-full max-w-[60rem] mx-auto">
         <div
           class="flex items-start lg:items-center justify-between w-full py-6 lg:py-0 lg:h-20 gap-4 lg:gap-2 flex-col lg:flex-row"
         >
-          <span class="text-xl font-medium text-n-slate-12">
-            {{ headerTitle }}
-            <slot name="headerTitle" />
-          </span>
+          <div class="flex gap-4 items-center">
+            <slot name="headerTitle">
+              <span class="text-xl font-medium text-n-slate-12">
+                {{ headerTitle }}
+              </span>
+            </slot>
+            <div v-if="!isEmpty" class="flex items-center gap-2">
+              <div class="w-0.5 h-4 rounded-2xl bg-n-weak" />
+              <slot name="knowMore" />
+            </div>
+          </div>
+
           <div
             v-if="!showPaywall"
             v-on-clickaway="() => emit('close')"
@@ -96,7 +104,7 @@ const handlePageChange = event => {
       </div>
     </header>
     <main class="flex-1 px-6 overflow-y-auto xl:px-0">
-      <div class="w-full max-w-[960px] mx-auto py-4">
+      <div class="w-full max-w-[60rem] mx-auto py-4">
         <slot v-if="!showPaywall" name="controls" />
         <div
           v-if="isFetching"

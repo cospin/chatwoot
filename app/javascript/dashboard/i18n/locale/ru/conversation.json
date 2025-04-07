@@ -12,6 +12,8 @@
     "NO_INBOX_2": " для начала",
     "NO_INBOX_AGENT": "Ой! Похоже, вы не добавлены ни к одному источнику сообщений. Обратитесь к администратору",
     "SEARCH_MESSAGES": "Поиск по сообщениям в диалогах",
+    "VIEW_ORIGINAL": "View original",
+    "VIEW_TRANSLATED": "View translated",
     "EMPTY_STATE": {
       "CMD_BAR": "открыть меню команд",
       "KEYBOARD_SHORTCUTS": "для просмотра быстрых клавиш"
@@ -54,7 +56,7 @@
     "SUCCESS_DELETE_MESSAGE": "Сообщение успешно удалено",
     "FAIL_DELETE_MESSSAGE": "Не удалось удалить сообщение! Попробуйте еще раз",
     "NO_RESPONSE": "Нет ответа",
-    "RESPONSE": "Response",
+    "RESPONSE": "Ответ",
     "RATING_TITLE": "Оценка",
     "FEEDBACK_TITLE": "Обратная связь",
     "REPLY_MESSAGE_NOT_FOUND": "Сообщение недоступно",
@@ -117,6 +119,7 @@
       "PENDING": "Отметить как ожидающие",
       "RESOLVED": "Пометить как разрешено",
       "MARK_AS_UNREAD": "Отметить как непрочитанное",
+      "MARK_AS_READ": "Отметить как прочитанное",
       "REOPEN": "Переоткрыть разговор",
       "SNOOZE": {
         "TITLE": "Отложено",
@@ -292,7 +295,27 @@
       "CONVERSATION_INFO": "Информация о беседе",
       "CONTACT_ATTRIBUTES": "Атрибуты контакта",
       "PREVIOUS_CONVERSATION": "Предыдущие диалоги",
-      "MACROS": "Макросс"
+      "MACROS": "Макросс",
+      "SHOPIFY_ORDERS": "Shopify Orders"
+    },
+    "SHOPIFY": {
+      "ORDER_ID": "Order #{id}",
+      "ERROR": "Error loading orders",
+      "NO_SHOPIFY_ORDERS": "No orders found",
+      "FINANCIAL_STATUS": {
+        "PENDING": "В ожидании",
+        "AUTHORIZED": "Authorized",
+        "PARTIALLY_PAID": "Partially Paid",
+        "PAID": "Paid",
+        "PARTIALLY_REFUNDED": "Partially Refunded",
+        "REFUNDED": "Refunded",
+        "VOIDED": "Voided"
+      },
+      "FULFILLMENT_STATUS": {
+        "FULFILLED": "Fulfilled",
+        "PARTIALLY_FULFILLED": "Partially Fulfilled",
+        "UNFULFILLED": "Unfulfilled"
+      }
     }
   },
   "CONVERSATION_CUSTOM_ATTRIBUTES": {
@@ -355,9 +378,9 @@
     "MULTIPLE": "{user} и {count} печатают"
   },
   "COPILOT": {
-    "TRY_THESE_PROMPTS": "Try these prompts"
+    "TRY_THESE_PROMPTS": "Попробуйте эти запросы"
   },
   "GALLERY_VIEW": {
-    "ERROR_DOWNLOADING": "Unable to download attachment. Please try again"
+    "ERROR_DOWNLOADING": "Не удалось загрузить вложение, попробуйте еще раз"
   }
 }

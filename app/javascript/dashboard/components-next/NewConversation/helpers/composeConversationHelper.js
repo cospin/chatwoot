@@ -25,6 +25,11 @@ export const generateLabelForContactableInboxesList = ({
     channelType === INBOX_TYPES.TWILIO ||
     channelType === INBOX_TYPES.WHATSAPP
   ) {
+    // Handled separately for Twilio Inbox where phone number is  not mandatory.
+    // You can send message to a contact with Messaging Service Id.
+    if (!phoneNumber) {
+      return name;
+    }
     return `${name} (${phoneNumber})`;
   }
   return name;
@@ -85,6 +90,21 @@ export const processContactableInboxes = inboxes => {
     ...inbox.inbox,
     sourceId: inbox.sourceId,
   }));
+};
+
+export const mergeInboxDetails = (inboxesData, inboxesList = []) => {
+  if (!inboxesData || !inboxesData.length) {
+    return [];
+  }
+
+  return inboxesData.map(inboxData => {
+    const matchingInbox =
+      inboxesList.find(inbox => inbox.id === inboxData.id) || {};
+    return {
+      ...camelcaseKeys(matchingInbox, { deep: true }),
+      ...inboxData,
+    };
+  });
 };
 
 export const prepareAttachmentPayload = (
