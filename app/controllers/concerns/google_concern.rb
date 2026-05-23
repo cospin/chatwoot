@@ -15,6 +15,6 @@ module GoogleConcern
   private
 
   def scope
-    'email profile gmail.send gmail.readonly'
+    'email profile https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.readonly'
   end
 end
