@@ -1,3 +1,5 @@
+import { INBOX_TYPES } from './inbox';
+
 /**
  * Determines the last non-activity message between store and API messages.
  * @param {Object} messageInStore - The last non-activity message from the store.
@@ -39,6 +41,25 @@ export const filterDuplicateSourceMessages = (messages = []) => {
     }
   });
   return messagesWithoutDuplicates;
+};
+
+export const isGoogleEmailConversation = (conversation = {}, inboxes = []) => {
+  const inbox = inboxes.find(
+    item => Number(item.id) === Number(conversation?.inbox_id)
+  );
+
+  return (
+    inbox?.channel_type === INBOX_TYPES.EMAIL && inbox?.provider === 'google'
+  );
+};
+
+export const getDeleteConversationDescriptionKey = (
+  conversation = {},
+  inboxes = []
+) => {
+  return isGoogleEmailConversation(conversation, inboxes)
+    ? 'CONVERSATION.DELETE_CONVERSATION.GMAIL_DESCRIPTION'
+    : 'CONVERSATION.DELETE_CONVERSATION.DESCRIPTION';
 };
 
 /**

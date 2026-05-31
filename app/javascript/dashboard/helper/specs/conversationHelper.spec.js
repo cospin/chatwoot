@@ -1,8 +1,10 @@
 import {
   filterDuplicateSourceMessages,
+  getDeleteConversationDescriptionKey,
   getLastMessage,
   getReadMessages,
   getUnreadMessages,
+  isGoogleEmailConversation,
 } from '../conversationHelper';
 import {
   conversationData,
@@ -95,6 +97,48 @@ describe('conversationHelper', () => {
       };
       expect(getLastMessage(testConversation)).toEqual(
         testConversation.messages[1]
+      );
+    });
+  });
+
+  describe('#isGoogleEmailConversation', () => {
+    it('returns true for a Google email inbox conversation', () => {
+      const conversation = { inbox_id: 1 };
+      const inboxes = [
+        { id: 1, channel_type: 'Channel::Email', provider: 'google' },
+      ];
+
+      expect(isGoogleEmailConversation(conversation, inboxes)).toBe(true);
+    });
+
+    it('returns false for other email providers', () => {
+      const conversation = { inbox_id: 1 };
+      const inboxes = [
+        { id: 1, channel_type: 'Channel::Email', provider: 'microsoft' },
+      ];
+
+      expect(isGoogleEmailConversation(conversation, inboxes)).toBe(false);
+    });
+  });
+
+  describe('#getDeleteConversationDescriptionKey', () => {
+    it('returns the Gmail permanent deletion key for Google email conversations', () => {
+      const conversation = { inbox_id: 1 };
+      const inboxes = [
+        { id: 1, channel_type: 'Channel::Email', provider: 'google' },
+      ];
+
+      expect(getDeleteConversationDescriptionKey(conversation, inboxes)).toBe(
+        'CONVERSATION.DELETE_CONVERSATION.GMAIL_DESCRIPTION'
+      );
+    });
+
+    it('returns the default key for non-Google conversations', () => {
+      const conversation = { inbox_id: 1 };
+      const inboxes = [{ id: 1, channel_type: 'Channel::Api', provider: null }];
+
+      expect(getDeleteConversationDescriptionKey(conversation, inboxes)).toBe(
+        'CONVERSATION.DELETE_CONVERSATION.DESCRIPTION'
       );
     });
   });

@@ -66,6 +66,8 @@ en:
       failed: Signup failed
     voice:
       call_already_accepted: '%{agent_name} is already handling the call.'
+    gmail:
+      thread_delete_failed: "Couldn't delete the Gmail thread. Please reauthorize the inbox or try again."
     assignment_policy:
       not_found: Assignment policy not found
     attachments:

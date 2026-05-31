@@ -140,8 +140,11 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
 
   def destroy
     authorize @conversation, :destroy?
+    Conversations::GmailThreadDeletionService.new(conversation: @conversation).perform
     ::DeleteObjectJob.perform_later(@conversation, Current.user, request.ip)
     head :ok
+  rescue Conversations::GmailThreadDeletionService::Error => e
+    render_could_not_create_error(e.message)
   end
 
   private

@@ -50,6 +50,7 @@ import {
   filterItemsByPermission,
 } from 'dashboard/helper/permissionsHelper.js';
 import { matchesFilters } from '../store/modules/conversations/helpers/filterHelpers';
+import { getDeleteConversationDescriptionKey } from 'dashboard/helper/conversationHelper';
 import { CONVERSATION_EVENTS } from '../helper/AnalyticsHelper/events';
 import { ASSIGNEE_TYPE_TAB_PERMISSIONS } from 'dashboard/constants/permissions.js';
 
@@ -798,6 +799,25 @@ onMounted(() => {
 
 const deleteConversationDialogRef = ref(null);
 const selectedConversationId = ref(null);
+const selectedConversation = computed(() => {
+  return getConversationById.value(selectedConversationId.value) || {};
+});
+const deleteConversationDescriptionKey = computed(() => {
+  return getDeleteConversationDescriptionKey(
+    selectedConversation.value,
+    inboxesList.value
+  );
+});
+const deleteConversationDescription = computed(() => {
+  if (
+    deleteConversationDescriptionKey.value ===
+    'CONVERSATION.DELETE_CONVERSATION.GMAIL_DESCRIPTION'
+  ) {
+    return t('CONVERSATION.DELETE_CONVERSATION.GMAIL_DESCRIPTION');
+  }
+
+  return t('CONVERSATION.DELETE_CONVERSATION.DESCRIPTION');
+});
 
 async function deleteConversation() {
   try {
@@ -951,7 +971,7 @@ watch(conversationFilters, (newVal, oldVal) => {
           conversationId: selectedConversationId,
         })
       "
-      :description="$t('CONVERSATION.DELETE_CONVERSATION.DESCRIPTION')"
+      :description="deleteConversationDescription"
       :confirm-button-label="$t('CONVERSATION.DELETE_CONVERSATION.CONFIRM')"
       @confirm="deleteConversation"
       @close="selectedConversationId = null"

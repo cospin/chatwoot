@@ -1113,6 +1113,59 @@ RSpec.describe 'Conversations API', type: :request do
 
         expect(response).to have_http_status(:ok)
       end
+
+      context 'when the conversation belongs to a Google email inbox' do
+        let(:google_channel) do
+          create(
+            :channel_email,
+            account: account,
+            provider: 'google',
+            imap_enabled: true,
+            provider_config: {
+              access_token: 'access-token',
+              refresh_token: 'refresh-token',
+              expires_on: 1.hour.from_now.to_s
+            }
+          )
+        end
+        let(:gmail_conversation) { create(:conversation, account: account, inbox: google_channel.inbox) }
+        let(:gmail_deletion_service) { instance_double(Conversations::GmailThreadDeletionService) }
+
+        before do
+          allow(Conversations::GmailThreadDeletionService)
+            .to receive(:new)
+            .with(conversation: gmail_conversation)
+            .and_return(gmail_deletion_service)
+        end
+
+        it 'enqueues local deletion after Gmail deletion succeeds' do
+          allow(gmail_deletion_service).to receive(:perform).and_return(true)
+
+          expect do
+            delete "/api/v1/accounts/#{account.id}/conversations/#{gmail_conversation.display_id}",
+                   headers: administrator.create_new_auth_token,
+                   as: :json
+          end.to have_enqueued_job(DeleteObjectJob).with(gmail_conversation, administrator, anything)
+
+          expect(gmail_deletion_service).to have_received(:perform)
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'does not enqueue local deletion when Gmail deletion fails' do
+          allow(gmail_deletion_service)
+            .to receive(:perform)
+            .and_raise(Conversations::GmailThreadDeletionService::Error, 'Gmail deletion failed')
+
+          expect do
+            delete "/api/v1/accounts/#{account.id}/conversations/#{gmail_conversation.display_id}",
+                   headers: administrator.create_new_auth_token,
+                   as: :json
+          end.not_to have_enqueued_job(DeleteObjectJob)
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body['error']).to eq('Gmail deletion failed')
+        end
+      end
     end
   end
 end

@@ -147,6 +147,7 @@
     "DELETE_CONVERSATION": {
       "TITLE": "Delete conversation #{conversationId}",
       "DESCRIPTION": "Are you sure you want to delete this conversation?",
+      "GMAIL_DESCRIPTION": "Are you sure you want to delete this conversation? This will permanently delete the Gmail thread and cannot be undone.",
       "CONFIRM": "Delete"
     },
     "CARD_CONTEXT_MENU": {
