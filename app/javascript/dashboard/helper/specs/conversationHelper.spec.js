@@ -111,6 +111,15 @@ describe('conversationHelper', () => {
       expect(isGoogleEmailConversation(conversation, inboxes)).toBe(true);
     });
 
+    it('returns true when the conversation metadata identifies Gmail', () => {
+      const conversation = {
+        inbox_id: 1,
+        meta: { channel: 'Channel::Email', channel_provider: 'google' },
+      };
+
+      expect(isGoogleEmailConversation(conversation, [])).toBe(true);
+    });
+
     it('returns false for other email providers', () => {
       const conversation = { inbox_id: 1 };
       const inboxes = [

@@ -44,6 +44,16 @@ export const filterDuplicateSourceMessages = (messages = []) => {
 };
 
 export const isGoogleEmailConversation = (conversation = {}, inboxes = []) => {
+  const conversationProvider =
+    conversation?.meta?.channel_provider || conversation?.meta?.channelProvider;
+
+  if (
+    conversation?.meta?.channel === INBOX_TYPES.EMAIL &&
+    conversationProvider === 'google'
+  ) {
+    return true;
+  }
+
   const inbox = inboxes.find(
     item => Number(item.id) === Number(conversation?.inbox_id)
   );

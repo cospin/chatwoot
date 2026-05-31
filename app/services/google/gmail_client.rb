@@ -8,22 +8,12 @@ class Google::GmailClient
   pattr_initialize [:channel!]
 
   def thread_id_for_message_id(message_id)
-    normalized_message_id = normalize_message_id(message_id)
-    return if normalized_message_id.blank?
+    message_id_queries(message_id).each do |query|
+      thread_id = thread_id_for_query(query)
+      return thread_id if thread_id.present?
+    end
 
-    response = request(
-      :get,
-      '/messages',
-      query: {
-        q: "rfc822msgid:#{normalized_message_id}",
-        includeSpamTrash: true,
-        maxResults: 1
-      }
-    )
-    return if not_found?(response)
-
-    ensure_success!(response)
-    response.parsed_response&.dig('messages', 0, 'threadId')
+    nil
   end
 
   def delete_thread(thread_id)
@@ -37,6 +27,22 @@ class Google::GmailClient
   end
 
   private
+
+  def thread_id_for_query(query)
+    response = request(
+      :get,
+      '/messages',
+      query: {
+        q: query,
+        includeSpamTrash: true,
+        maxResults: 1
+      }
+    )
+    return if not_found?(response)
+
+    ensure_success!(response)
+    response.parsed_response&.dig('messages', 0, 'threadId')
+  end
 
   def request(method, path, options = {})
     HTTParty.public_send(method, "#{BASE_URL}#{path}", options.merge(headers: headers))
@@ -67,10 +73,13 @@ class Google::GmailClient
     response.code.to_i == 404
   end
 
-  def normalize_message_id(message_id)
+  def message_id_queries(message_id)
     value = message_id.to_s.strip
-    return if value.blank?
+    return [] if value.blank?
 
-    "<#{value.delete_prefix('<').delete_suffix('>')}>"
+    bare_message_id = value.delete_prefix('<').delete_suffix('>')
+    return [] if bare_message_id.blank?
+
+    ["rfc822msgid:#{bare_message_id}", "rfc822msgid:<#{bare_message_id}>"].uniq
   end
 end

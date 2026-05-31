@@ -24,11 +24,11 @@ RSpec.describe Google::GmailClient do
   describe '#thread_id_for_message_id' do
     let(:messages_url) { 'https://gmail.googleapis.com/gmail/v1/users/me/messages' }
 
-    it 'searches Gmail by normalized RFC822 message id' do
+    it 'searches Gmail by RFC822 message id without brackets first' do
       request = stub_request(:get, messages_url)
                 .with(
                   query: hash_including(
-                    'q' => 'rfc822msgid:<message@example.com>',
+                    'q' => 'rfc822msgid:message@example.com',
                     'includeSpamTrash' => 'true',
                     'maxResults' => '1'
                   ),
@@ -44,17 +44,21 @@ RSpec.describe Google::GmailClient do
       expect(request).to have_been_requested
     end
 
-    it 'keeps an already bracketed RFC822 message id bracketed once' do
-      request = stub_request(:get, messages_url)
-                .with(query: hash_including('q' => 'rfc822msgid:<message@example.com>'))
-                .to_return(
-                  status: 200,
-                  body: { messages: [{ id: 'gmail-message-id', threadId: 'gmail-thread-id' }] }.to_json,
-                  headers: { 'Content-Type' => 'application/json' }
-                )
+    it 'falls back to a bracketed RFC822 message id query' do
+      raw_request = stub_request(:get, messages_url)
+                    .with(query: hash_including('q' => 'rfc822msgid:message@example.com'))
+                    .to_return(status: 200, body: { messages: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+      bracketed_request = stub_request(:get, messages_url)
+                          .with(query: hash_including('q' => 'rfc822msgid:<message@example.com>'))
+                          .to_return(
+                            status: 200,
+                            body: { messages: [{ id: 'gmail-message-id', threadId: 'gmail-thread-id' }] }.to_json,
+                            headers: { 'Content-Type' => 'application/json' }
+                          )
 
       expect(client.thread_id_for_message_id('<message@example.com>')).to eq('gmail-thread-id')
-      expect(request).to have_been_requested
+      expect(raw_request).to have_been_requested
+      expect(bracketed_request).to have_been_requested
     end
 
     it 'returns nil when Gmail has no matching message' do
@@ -74,7 +78,7 @@ RSpec.describe Google::GmailClient do
       [401, 403, 429, 500].each do |status|
         message_id = "message-#{status}@example.com"
         stub_request(:get, messages_url)
-          .with(query: hash_including('q' => "rfc822msgid:<#{message_id}>"))
+          .with(query: hash_including('q' => "rfc822msgid:#{message_id}"))
           .to_return(status: status, body: '{}')
 
         expect { client.thread_id_for_message_id(message_id) }
